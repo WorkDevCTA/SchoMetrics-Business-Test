@@ -1,0 +1,42 @@
+* CORRECCIONES
+- Verificar la existencia y funcionalidad para Escuelas mediante su CCT
+- Añadir seguridad y tipado de Contraseñas seguras
+- Adecuar los params ${userId} para rutas exclusivas
+
+
+En un proyecto hecho con Next.js 15 y TypeScript, tengo la siguiente porción de código:
+
+Complete name for prefix = /schometrics-business-test-1/SCHOOL/${state}/${city}/${nameSchool}/recyclable-material-images/${title}
+
+* AÑADIR funcionalidad PARA LOS BUSCADORES Y SELECTORES DE ESCUELAS
+* AÑDIR LA funcionalidad BACKEND Y FRON PARA COMPANY Y ADMIN
+
+En un proyecto hecho con Next.js 15, TypeScript, Tailwind CSS y Prisma ORM.
+Te proporcionaré dos archivo:
+• "route.ts" ubicado en "/api/school/recyclable-material/[userId]/route.ts", contiene un API endpoint para realizar operaciones CRUD de los Materiales Reciclables.
+• "page.tsx" ubicado en "/app/escuelas/materiales-publicados/[userId]/page.tsx", contiene la interfaz frontend para mostrar los Cards de los Materiales Reciclables que han sido publicados.
+
+Puedes añadir las siguiente características a la interfaz frontend:
+- Añadir los siguientes filtros:
+    • Buscador por Nombre.
+    • Selector por Tipo de Material Reciclable:
+        PLASTICO
+        PAPEL 
+        VIDRIO
+        METAL_COBRE
+        ORGANICO
+        ELECTRONICOS
+    • Selector por Disponibiliad:
+        Disponible
+        Comprado
+    • Selector por Estado de la República Mexicana:
+    {material.state} Contiene el Estado de la República Mexicana del Material Reciclable publicado.
+    
+
+
+En un proyecto hecho con Next.js 15, TypeScript, Tailwind CSS y Prisma ORM.
+Te proporcionaré dos archivo:
+• "route.ts" ubicado en "/api/school/recyclable-material/route.ts", contiene un API endpoint para realizar operaciones CRUD de los Materiales Reciclables.
+• "page.tsx" ubicado en "/app/escuelas/materiales-publicados/page.tsx", contiene la interfaz frontend para mostrar los Cards de los Materiales Reciclables que han sido publicados.
+
+Puedes verificar la funcionalidad de los códigos, ya que necesito que en la interfaz únicamente se muentren los Cards propios del usuario, solo mostrar los suyos, los que el usuario haya publicado.

@@ -1,0 +1,157 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL_LOCAL")
+}
+
+// Model for users
+model User {
+  id         String   @id @default(cuid())
+  identifier String   @unique
+  name       String
+  password   String
+  role       Role     @default(USER)
+  userType   UserType @default(SCHOOL)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // ====== Relations ======= //
+  profile            Profile?
+  recyclableMaterials RecyclableMaterial[]
+  purchases          Purchase[]
+  
+  @@map("users")
+}
+
+// enum for UserTypes
+enum UserType {
+  SCHOOL
+  COMPANY
+  ADMIN
+}
+
+// enum for Roles
+enum Role {
+  USER
+  ADMIN
+}
+
+// Model Profile
+model Profile {
+  id        String  @id @default(cuid())
+  email     String  @unique
+  bio       String?
+  city      String?
+  state     String?
+  postalCode String?
+  address   String?
+  phone     String?
+  rfc       String? // For companies
+  cct       String? // For SCHOOLS Clave del Centro de Trabajo (CCT)
+  avatarUrl String?
+  latitude  Float?
+  longitude Float?
+
+  // ====== Relations ======= //
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("profiles")
+}
+
+// Model for Recyclable Materials
+model RecyclableMaterial {
+  id          String       @id @default(cuid())
+  title       String
+  materialType MaterialType
+  quantity    Float        // in kg
+  city        String
+  state       String
+  postalCode  String
+  address     String
+  latitude    Float
+  longitude   Float
+  schedule    String       // horario de atención
+  images  RecyclableMaterialImage[] // Relación uno-a-muchos con las imágenes
+  status      MaterialStatus @default(AVAILABLE)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // ====== Relations ======= //
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purchases Purchase[]
+  
+  @@map("recyclable_materials")
+}
+
+// Model for Recyclable Material Images
+model RecyclableMaterialImage {
+  id               String         @id @default(cuid())
+  s3Key            String // La clave del archivo en S3
+  order            Int // Para mantener el orden de las imágenes
+  recyclableMaterialId String @map("RecyclableMaterialId")
+  recyclableMaterial   RecyclableMaterial @relation(fields: [recyclableMaterialId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([recyclableMaterialId])
+	@@map("RecyclableMaterialImage")
+}
+
+// enum for Material Types
+enum MaterialType {
+  PLASTICO
+  PAPEL
+  VIDRIO
+  METAL_COBRE
+  ORGANICO
+  ELECTRONICOS
+}
+
+// enum for Material Status
+enum MaterialStatus {
+  AVAILABLE
+  PURCHASED
+}
+
+// Model for Purchases
+model Purchase {
+  id                String   @id @default(cuid())
+  folioNumber       String   @unique // NanoID for validation
+  companyName       String
+  companyRfc        String
+  companyAddress    String
+  companyPhone      String
+  transporterName   String
+  transporterPhone  String
+  transctionDate    DateTime
+  totalporterInfo   String   // RFC, CURP, Matricula, etc.
+  colleAmount       Float
+  paymentStatus     PaymentStatus @default(PENDING)
+  paymentId         String?  // Openpay payment ID
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // ====== Relations ======= //
+  userId             String
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recyclableMaterialId String
+  recyclableMaterial RecyclableMaterial @relation(fields: [recyclableMaterialId], references: [id], onDelete: Cascade)
+  
+  @@map("purchases")
+}
+
+// enum for Payment Status
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
