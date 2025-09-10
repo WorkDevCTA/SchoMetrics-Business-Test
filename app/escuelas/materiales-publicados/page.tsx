@@ -2,26 +2,26 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MapPin, Clock, Download, Search, Filter, CheckCircle, Eye, Edit } from "lucide-react"
+import { MapPin, Clock, Download, Search, Filter, CheckCircle, Edit, LucideBoxes, Map, MapPinHouseIcon, RectangleEllipsisIcon, School, Box } from "lucide-react"
 import Link from "next/link"
 import { MATERIAL_TYPE_LABELS, MEXICAN_STATES } from "@/lib/constants"
-import { SchoolNavigation } from "@/app/components/school/school-navigation"
 import LoaderCircle from "@/app/components/LoaderCircle"
-import type { RecyclableMaterialUserData } from "@/types/types"
+import type { RecyclableMaterialUserData, SchoolUserProfileData } from "@/types/types"
 import { RecyclableMaterialContentImages } from "@/app/components/RecyclableMaterialContentImages"
 import toast from "react-hot-toast"
 import { MaterialType } from "@prisma/client"
-import useUserSession from "@/hooks/useUserSession"
+import { SchoolNavBar } from "@/app/components/school/SchoolNavBar"
 
 const ITEMS_PER_PAGE = 9;
 
 
 export default function SchoolPublishedMaterialsPage() {
   const [recyclableMaterials, setRecyclableMaterials] = useState<RecyclableMaterialUserData | null>(null)
+  const [profile, setProfile] = useState<SchoolUserProfileData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedMaterialType, setSelectedMaterialType] = useState<string>("all")
@@ -33,6 +33,7 @@ export default function SchoolPublishedMaterialsPage() {
 
   useEffect(() => {
     fetchMaterials()
+    fetchProfile()
   }, [])
 
   const filteredMaterials = useMemo(() => {
@@ -78,6 +79,20 @@ export default function SchoolPublishedMaterialsPage() {
     }
   }
 
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch("/api/school/profile")
+      if (response.ok) {
+        const data = await response.json()
+        setProfile(data)
+      }
+    } catch (error) {
+      toast.error("Error al cargar perfil")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const openGoogleMaps = (latitude: number, longitude: number) => {
     const url = `https://www.google.com/maps?q=${latitude},${longitude}`
     window.open(url, "_blank")
@@ -93,7 +108,7 @@ export default function SchoolPublishedMaterialsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <SchoolNavigation />
+        <SchoolNavBar />
         <LoaderCircle />
       </div>
     )
@@ -101,7 +116,7 @@ export default function SchoolPublishedMaterialsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <SchoolNavigation />
+      <SchoolNavBar />
 
       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
@@ -196,13 +211,13 @@ export default function SchoolPublishedMaterialsPage() {
           {filteredMaterials.map((material) => (
             <Card key={material.id} className="overflow-hidden">
               <CardHeader>
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col items-start justify-between">
                   <div>
                     <CardTitle className="text-lg">{material.title}</CardTitle>
-                    <CardDescription>{material.quantity} kg</CardDescription>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex gap-2 mt-3">
                     <Badge className="bg-sky-500 text-white flex text-center items-center w-max">
+                      <Box className="mr-1 h-4 w-4" />
                       {MATERIAL_TYPE_LABELS[material.materialType]}
                     </Badge>
                     {
@@ -226,13 +241,65 @@ export default function SchoolPublishedMaterialsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  {material.city}, {material.state}
+                  <School className="h-4 w-4" />
+                  <p className="font-bold">
+                    {profile?.name}
+                  </p>
                 </div>
-
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  {material.schedule}
+                  <LucideBoxes className="h-4 w-4" />
+                  Cantidad de Material:
+                  <p className="font-bold">
+                    {material.quantity} kg
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Map className="h-4 w-4" />
+                  <p className="font-bold">
+                    {material.city}, {material.state}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPin className="h-4 w-4" />
+                  <p className="font-bold">
+                    {profile?.profile?.address}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPinHouseIcon className="h-4 w-4" />
+                  Código Postal:
+                  <p className="font-bold">
+                    {profile?.profile?.postalCode}
+                  </p>
+                </div>
+                {
+                  profile?.userType === "SCHOOL" && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <RectangleEllipsisIcon className="h-4 w-4" />
+                      CCT:
+                      <p className="font-bold">
+                        {profile?.profile?.cct}
+                      </p>
+                    </div>
+                  )
+                }
+                {
+                  profile?.userType === "SCHOOL" && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <RectangleEllipsisIcon className="h-4 w-4" />
+                      RFC:
+                      <p className="font-bold">
+                        {profile?.profile?.rfc}
+                      </p>
+                    </div>
+                  )
+                }
+                <div className="flex flex-col items-start justify-start gap-2 text-sm text-muted-foreground">
+                  - Horario de Atención para Recolección de Materiales:
+                  <p className="font-bold flex gap-2 items-center justify-center">
+                    <Clock className="h-4 w-4" />
+                    {material.schedule}
+                  </p>
                 </div>
                 {/* Image List */}
                 <div className="">
@@ -266,9 +333,9 @@ export default function SchoolPublishedMaterialsPage() {
 
                   <Link href={`/escuelas/materiales-publicados/editar/${material.id}`}>
                     <Button
-                      variant="outline"
+                      variant="destructive"
                       size="sm"
-                      className="h-auto border-2 border-schoMetricsBaseColor/40 px-2 py-2 text-xs hover:border-schoMetricsBaseColor hover:text-schoMetricsBaseColor"
+                      className="h-auto px-2 py-2 text-xs"
                     >
                       <Edit className="mr-1 h-3.5 w-3.5" /> Editar/Eliminar
                     </Button>

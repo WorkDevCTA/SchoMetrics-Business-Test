@@ -126,8 +126,8 @@ export async function POST(request: NextRequest) {
         file.name,
         "image/jpeg",
         currentUser.userType,
-        // currentUser.profile?.state || "",
-        // currentUser.profile?.city || "",
+        currentUser.profile?.state || "",
+        currentUser.profile?.city || "",
         currentUser.identifier,
         title
       ); // Usa la nueva función específica

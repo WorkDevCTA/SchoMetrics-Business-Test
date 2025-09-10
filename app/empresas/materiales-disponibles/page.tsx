@@ -2,19 +2,20 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MapPin, Clock, Download, Search, Filter, CheckCircle, ShoppingCart } from "lucide-react"
+import { MapPin, Clock, Download, Search, Filter, CheckCircle, ShoppingCart, Box, School, LucideBoxes, Map, MapPinHouseIcon, RectangleEllipsisIcon } from "lucide-react"
 import Link from "next/link"
 import { MATERIAL_PRICES, MATERIAL_TYPE_LABELS, MEXICAN_STATES } from "@/lib/constants"
-import { SchoolNavigation } from "@/app/components/school/school-navigation"
 import LoaderCircle from "@/app/components/LoaderCircle"
 import type { RecyclableMaterialUserData } from "@/types/types"
 import { RecyclableMaterialContentImages } from "@/app/components/RecyclableMaterialContentImages"
 import toast from "react-hot-toast"
 import { MaterialType } from "@prisma/client"
+import { CompanyNavBar } from "@/app/components/company/CompanyNavBar"
+
 
 export default function PublishedMaterialsPage() {
   const [recyclableMaterials, setRecyclableMaterials] = useState<RecyclableMaterialUserData | null>(null)
@@ -85,7 +86,7 @@ export default function PublishedMaterialsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <SchoolNavigation />
+        <CompanyNavBar />
         <LoaderCircle />
       </div>
     )
@@ -93,7 +94,7 @@ export default function PublishedMaterialsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <SchoolNavigation />
+      <CompanyNavBar />
 
       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
@@ -188,19 +189,27 @@ export default function PublishedMaterialsPage() {
           {filteredMaterials.map((material) => (
             <Card key={material.id} className="overflow-hidden">
               <CardHeader>
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col items-start justify-between">
                   <div>
                     <CardTitle className="text-lg">{material.title}</CardTitle>
-                    <CardDescription>{material.quantity} kg</CardDescription>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 mt-3">
+                    {
+                      material.user.userType === "SCHOOL" && (
+                        <Badge className="bg-lime-500 text-white hover:bg-lime-600 w-max">
+                          <School className="mr-2 h-4 w-4" />
+                          ESCUELA
+                        </Badge>
+                      )
+                    }
                     <Badge className="bg-sky-500 text-white flex text-center items-center w-max">
+                      <Box className="mr-2 h-4 w-4" />
                       {MATERIAL_TYPE_LABELS[material.materialType]}
                     </Badge>
                     {
                       material.status === "AVAILABLE" && (
                         <Badge className="bg-amber-500 text-white hover:bg-amber-600 w-max">
-                          <Clock className="mr-1 h-4 w-4 animate-spin" />
+                          <Clock className="mr-2 h-4 w-4 animate-spin" />
                           Disponible
                         </Badge>
                       )
@@ -208,7 +217,7 @@ export default function PublishedMaterialsPage() {
                     {
                       material.status === "PURCHASED" && (
                         <Badge className="bg-green-500 text-white hover:bg-green-600 w-max">
-                          <CheckCircle className="mr-1 h-4 w-4" />
+                          <CheckCircle className="mr-2 h-4 w-4" />
                           Comprado
                         </Badge>
                       )
@@ -218,13 +227,57 @@ export default function PublishedMaterialsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  {material.city}, {material.state}
+                  <School className="h-4 w-4 text-lime-600" />
+                  <p className="font-bold uppercase text-lime-600">
+                    {material.user.name}
+                  </p>
                 </div>
-
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  {material.schedule}
+                  <LucideBoxes className="h-4 w-4" />
+                  Cantidad de Material:
+                  <p className="font-bold">
+                    {material.quantity} kg
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Map className="h-4 w-4" />
+                  <p className="font-bold">
+                    {material.city}, {material.state}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPin className="h-4 w-4" />
+                  <p className="font-bold">
+                    {material.address}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPinHouseIcon className="h-4 w-4" />
+                  Código Postal:
+                  <p className="font-bold">
+                    {material.postalCode}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <RectangleEllipsisIcon className="h-4 w-4" />
+                  CCT:
+                  <p className="font-bold">
+                    {material.user.profile?.cct}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <RectangleEllipsisIcon className="h-4 w-4" />
+                  RFC:
+                  <p className="font-bold">
+                    {material.user.profile?.rfc}
+                  </p>
+                </div>
+                <div className="flex flex-col items-start justify-start gap-2 text-sm text-muted-foreground">
+                  - Horario de Atención para Recolección de Materiales:
+                  <p className="font-bold flex gap-2 items-center justify-center">
+                    <Clock className="h-4 w-4" />
+                    {material.schedule}
+                  </p>
                 </div>
 
                 <div className="bg-muted/50 p-3 rounded-lg">

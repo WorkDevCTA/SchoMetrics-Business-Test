@@ -11,6 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MexicanState, MEXICAN_STATES } from "@/lib/constants";
 import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,6 +27,13 @@ const ManualFormCreateUser = () => {
     identifier: "",
     password: "",
     confirmPassword: "",
+    email: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    address: "",
+    rfc: "",
+    cct: "",
     userType: "SCHOOL",
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -35,6 +44,14 @@ const ManualFormCreateUser = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState<
     string | null
   >(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [cityError, setCityError] = useState<string | null>(null);
+  const [stateError, setStateError] = useState<string | null>(null);
+  const [postalCodeError, setPostalCodeError] = useState<string | null>(null);
+  const [addressError, setAddressError] = useState<string | null>(null);
+  const [rfcError, setRfcError] = useState<string | null>(null);
+  const [cctError, setCctError] = useState<string | null>(null);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,6 +61,18 @@ const ManualFormCreateUser = () => {
     if (name === "identifier") setidentifierError(null);
     if (name === "password") setPasswordError(null);
     if (name === "confirmPassword") setConfirmPasswordError(null);
+    if (name === "email") setEmailError(null);
+    if (name === "city") setCityError(null);
+    if (name === "state") setStateError(null);
+    if (name === "postalCode") setPostalCodeError(null);
+    if (name === "address") setAddressError(null);
+    if (name === "rfc") setRfcError(null);
+    if (name === "cct") setCctError(null);
+  };
+
+
+  const handleStateChange = (value: MexicanState | "") => {
+    setFormData((prev) => ({ ...prev, state: value }));
   };
 
   const handleUserTypeChange = (value: string) => {
@@ -101,6 +130,13 @@ const ManualFormCreateUser = () => {
           name: formData.name,
           identifier: formData.identifier,
           password: formData.password,
+          email: formData.email,
+          city: formData.city,
+          state: formData.state,
+          postalCode: formData.postalCode,
+          address: formData.address,
+          rfc: formData.rfc,
+          cct: formData.cct,
           userType: formData.userType,
         }),
       });
@@ -120,6 +156,13 @@ const ManualFormCreateUser = () => {
         formData.identifier = "";
         formData.password = "";
         formData.confirmPassword = "";
+        formData.email = "";
+        formData.city = "";
+        formData.state = "";
+        formData.postalCode = "";
+        formData.address = "";
+        formData.rfc = "";
+        formData.cct = "";
         formData.userType = "SCHOOL";
 
         setFormData(formData);
@@ -247,6 +290,113 @@ const ManualFormCreateUser = () => {
                 <p className="text-sm text-red-500">{confirmPasswordError}</p>
               )}
             </div>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="email">Correo electrónico</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Correo electrónico"
+              value={formData.email}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+            {emailError && <p className="text-sm text-red-500">{emailError}</p>}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="city">Ciudad</Label>
+            <Input
+              id="city"
+              name="city"
+              type="text"
+              placeholder="Ciudad"
+              value={formData.city}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+            {cityError && <p className="text-sm text-red-500">{cityError}</p>}
+          </div>
+          <div className="space-y-2 w-max">
+            <Label htmlFor="state">
+              Estado <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              value={formData.state}
+              onValueChange={(value) =>
+                handleStateChange(value as MexicanState | "")
+              }
+              disabled={isLoading}
+            >
+              <SelectTrigger id="state">
+                <SelectValue placeholder="Selecciona un estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Estados de México</SelectLabel>
+                  {MEXICAN_STATES.map((stateName) => (
+                    <SelectItem key={stateName} value={stateName}>
+                      {stateName}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            {stateError && <p className="text-sm text-red-500">{stateError}</p>}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="postalCode">Código Postal</Label>
+            <Input
+              id="postalCode"
+              name="postalCode"
+              type="text"
+              placeholder="Código Postal"
+              value={formData.postalCode}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+            {postalCodeError && (
+              <p className="text-sm text-red-500">{postalCodeError}</p>
+            )}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="address">Dirección</Label>
+            <Input
+              id="address"
+              name="address"
+              type="text"
+              placeholder="Dirección"
+              value={formData.address}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+            {addressError && <p className="text-sm text-red-500">{addressError}</p>}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="rfc">RFC</Label>
+            <Input
+              id="rfc"
+              name="rfc"
+              type="text"
+              placeholder="RFC"
+              value={formData.rfc}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+            {rfcError && <p className="text-sm text-red-500">{rfcError}</p>}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="cct">CCT</Label>
+            <Input
+              id="cct"
+              name="cct"
+              type="text"
+              placeholder="CCT"
+              value={formData.cct}
+              onChange={handleChange}
+              disabled={isLoading}
+            />
+            {cctError && <p className="text-sm text-red-500">{cctError}</p>}
           </div>
           <div className="grid gap-2">
             <Label>Tipo de usuario</Label>

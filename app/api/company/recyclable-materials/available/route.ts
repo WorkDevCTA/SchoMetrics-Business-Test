@@ -44,7 +44,9 @@ export async function GET(request: NextRequest) {
       skip,
       take: limit,
       include: {
-        user: { select: { id: true, name: true, userType: true } },
+        user: {
+          select: { id: true, name: true, userType: true, profile: true },
+        },
         images: {
           orderBy: { order: "asc" },
           select: { id: true, s3Key: true, order: true },

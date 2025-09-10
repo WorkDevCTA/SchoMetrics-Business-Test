@@ -46,17 +46,14 @@ enum Role {
 model Profile {
   id        String  @id @default(cuid())
   email     String  @unique
-  bio       String?
   city      String?
   state     String?
   postalCode String?
   address   String?
   phone     String?
-  rfc       String? // For companies
-  cct       String? // For SCHOOLS Clave del Centro de Trabajo (CCT)
+  rfc       String?  @unique // For companies
+  cct       String?  @unique// For SCHOOLS Clave del Centro de Trabajo (CCT)
   avatarUrl String?
-  latitude  Float?
-  longitude Float?
 
   // ====== Relations ======= //
   userId String @unique

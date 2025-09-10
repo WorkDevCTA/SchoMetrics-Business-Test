@@ -65,7 +65,7 @@ export default function AdminLoginPage() {
         toast.success("Inicio de sesión exitoso");
         toast.success("Bienvenido al panel de administración");
         // Redirigir al panel de administración
-        router.push("/admin/materiales-disponibles");
+        router.push("/admin/perfil");
         router.refresh();
       }
     } catch (error) {

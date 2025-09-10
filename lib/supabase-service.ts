@@ -31,8 +31,8 @@ export const uploadRecyclableMaterialImageToSupabase = async (
   originalFileName: string,
   mimeType: string,
   userTypePrefix: string,
-  // statePrefix: string,
-  // cityPrefix: string,
+  statePrefix: string,
+  cityPrefix: string,
   identifierPrefix: string,
   titleResourceEducation: string,
   folderPrefix = "recyclable-material-images/"
@@ -47,7 +47,7 @@ export const uploadRecyclableMaterialImageToSupabase = async (
   const uniqueFileName = generateUniqueFileName(originalFileName);
   const sanitizedTitle = sanitizeForStorageKey(titleResourceEducation);
   // const fileKey = `${userTypePrefix}/${statePrefix}/${cityPrefix}/${nameAccountPrefix}/${folderPrefix}${sanitizedTitle}/${uniqueFileName}`;
-  const fileKey = `${userTypePrefix}/${identifierPrefix}/${folderPrefix}${sanitizedTitle}/${uniqueFileName}`;
+  const fileKey = `${userTypePrefix}/${statePrefix}/${cityPrefix}/${identifierPrefix}/${folderPrefix}${sanitizedTitle}/${uniqueFileName}`;
   const format = originalFileName.split(".").pop()?.toLowerCase() || "";
 
   try {
@@ -93,8 +93,8 @@ export const uploadAvatarToSupabase = async (
   userTypePrefix: string,
   statePrefix: string,
   cityPrefix: string,
-  nameAccountPrefix: string,
-  folderPrefix = "img-profile/"
+  identifierPrefix: string,
+  folderPrefix = "image-profile/"
 ): Promise<{
   fileKey: string;
   publicUrl: string;
@@ -104,7 +104,7 @@ export const uploadAvatarToSupabase = async (
   format: string;
 }> => {
   const uniqueFileName = generateUniqueFileName(originalFileName);
-  const fileKey = `${userTypePrefix}/${statePrefix}/${cityPrefix}/${nameAccountPrefix}/${folderPrefix}${uniqueFileName}`;
+  const fileKey = `${userTypePrefix}/${statePrefix}/${cityPrefix}/${identifierPrefix}/${folderPrefix}${uniqueFileName}`;
   const format = originalFileName.split(".").pop()?.toLowerCase() || "";
 
   try {
@@ -144,7 +144,7 @@ export const uploadAvatarToSupabase = async (
 export const getSignedFileUrl = async (
   bucketName: string,
   filePath: string,
-  expiresIn: number = 3600 // segundos
+  expiresIn = 3600 // segundos
 ): Promise<string> => {
   try {
     const { data, error } = await supabaseClient.storage
@@ -193,9 +193,9 @@ export const deleteUserFolderFromSupabase = async (
   userTypePrefix: string,
   statePrefix: string,
   cityPrefix: string,
-  nameAccountPrefix: string
+  identifierPrefix: string
 ): Promise<void> => {
-  const folderPrefix = `${userTypePrefix}/${statePrefix}/${cityPrefix}/${nameAccountPrefix}/`;
+  const folderPrefix = `${userTypePrefix}/${statePrefix}/${cityPrefix}/${identifierPrefix}/`;
 
   try {
     // List all files with the folder prefix
@@ -286,6 +286,11 @@ export const moveFileInSupabase = async (
   newFileKey: string
 ): Promise<void> => {
   try {
+    if (oldFileKey === newFileKey) {
+      console.log(`File keys are identical, skipping move: ${oldFileKey}`);
+      return;
+    }
+
     // Download the file from the old location
     const { data: fileData, error: downloadError } =
       await supabaseClient.storage.from(bucketName).download(oldFileKey);
@@ -298,11 +303,10 @@ export const moveFileInSupabase = async (
       throw new Error("Error al descargar el archivo para mover");
     }
 
-    // Upload the file to the new location
     const { error: uploadError } = await supabaseClient.storage
       .from(bucketName)
       .upload(newFileKey, fileData, {
-        upsert: false,
+        upsert: true, // Changed from false to true to allow overwriting existing files
       });
 
     if (uploadError) {

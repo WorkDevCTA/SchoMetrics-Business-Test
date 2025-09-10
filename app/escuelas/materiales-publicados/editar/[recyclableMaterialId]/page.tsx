@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, FormEvent, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
-import Link from "next/link";
 import {
     BookOpen,
     Loader2,
@@ -11,8 +10,6 @@ import {
     X,
     Trash2,
     RotateCcw,
-    ArrowLeft,
-    Edit,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +22,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
     Select,
     SelectContent,
@@ -49,6 +45,7 @@ import useUserSession from "@/hooks/useUserSession";
 import { RecyclableMaterialItem } from "@/types/types";
 import LoaderCircle from "@/app/components/LoaderCircle";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { SchoolNavigation } from "@/app/components/school/SchoolNavigation";
 
 // Esquema Zod para el formulario de edición de material visual
 const recyclableMaterialFormSchemaClient = z.object({
@@ -407,16 +404,9 @@ export default function EditReciclableMaterialPage() {
             session.userType === UserType.ADMIN);
 
     return (
-        <div className="container mx-auto mt-10 px-4 py-8 md:mt-2">
-            <div className="mb-6 mt-10 md:mt-2">
-                <Link
-                    href="/escuelas/materiales-publicados"
-                    className="flex items-center text-sm text-lime-600 hover:underline"
-                >
-                    <ArrowLeft className="mr-1 h-4 w-4" /> Volver a Material Visual
-                </Link>
-            </div>
-            <Card className="mx-auto max-w-3xl">
+        <div className="min-h-screen bg-slate-50">
+            <SchoolNavigation />
+            <Card className="mx-auto max-w-3xl my-10">
                 <CardHeader>
                     <div className="mb-2 flex items-center gap-3">
                         <BookOpen className="h-7 w-7 text-lime-600" />

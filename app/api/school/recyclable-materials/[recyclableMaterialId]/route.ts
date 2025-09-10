@@ -8,6 +8,7 @@ import {
   deleteFileFromSupabase,
   getPublicSupabaseUrl,
   moveFileInSupabase,
+  sanitizeForStorageKey,
 } from "@/lib/supabase-service";
 import { UserType, MaterialType } from "@prisma/client";
 import { MAX_FILES, MIN_FILES } from "@/types/types-supabase-service";
@@ -204,12 +205,17 @@ export async function PUT(
     try {
       // 1. Mover imágenes existentes si cambia el título (fuera de transacción)
       if (existingMaterial.title !== finalTitle) {
+        const oldTitleSanitized = sanitizeForStorageKey(existingMaterial.title);
+        const newTitleSanitized = sanitizeForStorageKey(finalTitle);
+
         for (const img of existingImages) {
           const oldKey = img.s3Key;
-          const newKey = oldKey.replace(existingMaterial.title, finalTitle);
+          const newKey = oldKey.replace(oldTitleSanitized, newTitleSanitized);
 
-          await moveFileInSupabase(oldKey, newKey);
-          movedFiles.push({ oldKey, newKey });
+          if (oldKey !== newKey) {
+            await moveFileInSupabase(oldKey, newKey);
+            movedFiles.push({ oldKey, newKey });
+          }
         }
       }
 
@@ -235,19 +241,12 @@ export async function PUT(
         const optimizedBuffer = await optimizeImage(file);
 
         const supabaseResponse = await uploadRecyclableMaterialImageToSupabase(
-          // optimizedBuffer,
-          // file.name,
-          // "image/jpeg",
-          // currentUser.userType,
-          // currentUser.identifier,
-          // finalTitle
-
           optimizedBuffer,
           file.name,
           "image/jpeg",
           currentUser.userType,
-          // currentUser.profile?.state || "",
-          // currentUser.profile?.city || "",
+          currentUser.profile?.state || "",
+          currentUser.profile?.city || "",
           currentUser.identifier,
           finalTitle
         );

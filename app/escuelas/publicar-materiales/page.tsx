@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Save, X, Upload, ArrowLeft, BoxIcon } from "lucide-react";
+import { Loader2, Save, X, Upload, BoxIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,9 +33,9 @@ import {
   MIN_FILES,
   MAX_FILE_SIZE,
 } from "@/types/types-supabase-service";
-import Link from "next/link";
 import { MEXICAN_STATES, MexicanState } from "@/lib/constants";
 import LoaderCircle from "@/app/components/LoaderCircle";
+import { SchoolNavigation } from '../../components/school/SchoolNavigation';
 
 // Esquema de validación Zod para el frontend
 const RecyclableMaterialFormSchemaClient = z.object({
@@ -290,16 +290,9 @@ export default function NewRecyclableMaterialPage() {
   const recyclableMaterialArray = Object.values(MaterialType);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6 mt-16 lg:mt-0">
-        <Link
-          href={`/escuelas/materiales-publicados`}
-          className="flex items-center text-sm text-lime-600 hover:underline"
-        >
-          <ArrowLeft className="mr-1 h-4 w-4" /> Volver a Materiales Publicados
-        </Link>
-      </div>
-      <Card className="0 mx-auto max-w-3xl">
+    <div className="min-h-screen bg-slate-50">
+      <SchoolNavigation />
+      <Card className="0 mx-auto max-w-3xl my-10">
         <CardHeader>
           <div className="mb-2 flex items-center gap-3">
             <BoxIcon className="h-7 w-7 text-lime-600" />

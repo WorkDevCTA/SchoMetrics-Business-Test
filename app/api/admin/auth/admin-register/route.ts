@@ -52,7 +52,6 @@ export async function POST(request: Request) {
     await prisma.profile.create({
       data: {
         email: `cambiarestecorreo@${user.id.slice(0, 10)}.com`,
-        bio: "Administrador de SchoMetrics",
         userId: user.id,
       },
     });
